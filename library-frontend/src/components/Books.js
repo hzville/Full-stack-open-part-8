@@ -3,7 +3,9 @@ import { ALL_BOOKS } from '../graphqlQueries/allBooksQuery'
 
 const Books = (props) => {
 
-  const books = useQuery(ALL_BOOKS)
+  const books = useQuery(ALL_BOOKS, {
+    pollInterval: 2000
+  })
 
   if (!props.show) {
     return null

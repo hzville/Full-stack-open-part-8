@@ -2,7 +2,9 @@ import { useQuery } from '@apollo/client'
 import { ALL_AUTHORS } from '../graphqlQueries/allAuthorsQuery'
 
 const Authors = (props) => {
-  const authors = useQuery(ALL_AUTHORS)
+  const authors = useQuery(ALL_AUTHORS, {
+    pollInterval: 2000
+  })
   
   if (!props.show) return null
 
@@ -23,7 +25,6 @@ const Authors = (props) => {
               <td>{a.name}</td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
-              a
             </tr>
           ))}
         </tbody>
