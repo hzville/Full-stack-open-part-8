@@ -1,5 +1,3 @@
-let books = require('../../data/books')
-let authors = require('../../data/authors')
 const Author = require('../../models/authorSchema')
 const Book = require('../../models/bookSchema')
 
@@ -11,14 +9,14 @@ const resolvers = {
       if (!args.author && !args.genre){
         return Book.find({}).populate('author')
       }
-      const authorFilter = args.author ? books.filter((book) => book.author == args.author) : books
-      const genrefilter = args.genre ? authorFilter.filter((book) => book.genres.includes(args.genre)) : authorFilter
-      return genrefilter
+      if (args.genre) {
+        return await Book.find({genres: {$in: args.genre}}).populate('author')
+      }
     },
     allAuthors: async () => Author.find({})
   },
   Author: {
-    bookCount: (root) => books.filter((book) => book.author == root.name).length
+    bookCount: async (root) => (await Book.find({author: root.id})).length
   },
   Mutation: {
     addBook: async (root, args) => {
@@ -32,14 +30,13 @@ const resolvers = {
         return await book.save()
       }
     },
-    editAuthor: (root, args) => {
-      const author = authors.find(author => author.name.toLowerCase() === args.name.toLowerCase())
-      if (!author) {
+    editAuthor: async (root, args) => {
+      let author = await Author.findOne({name: args.name})
+      if (!author){
         return null
       }
-      const updateAuthor = { ...author, born: args.setBornTo}
-      authors = authors.map(author => author.name === args.name ? updateAuthor : author)
-      return updateAuthor
+      author.born = args.setBornTo
+      return await author.save()
     }
   }
 }
