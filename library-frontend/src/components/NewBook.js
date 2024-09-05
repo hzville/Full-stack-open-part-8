@@ -2,16 +2,20 @@ import { useState } from 'react'
 import { CREATE_NEW_BOOK } from '../graphqlQueries/createNewBook'
 import { useMutation } from '@apollo/client'
 
-const NewBook = (props) => {
+const NewBook = ({show, setError}) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  const [ createBook ] = useMutation(CREATE_NEW_BOOK)
+  const [ createBook ] = useMutation(CREATE_NEW_BOOK, {
+    onError: (error) => {
+      setError(error.graphQLErrors[0].message)
+    }
+  })
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -19,8 +23,6 @@ const NewBook = (props) => {
     event.preventDefault()
 
     createBook({ variables: {title, author, published, genres}})
-
-    console.log('add book...')
 
     setTitle('')
     setPublished('')

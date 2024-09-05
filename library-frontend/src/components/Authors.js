@@ -2,12 +2,12 @@ import { useQuery } from '@apollo/client'
 import { ALL_AUTHORS } from '../graphqlQueries/allAuthorsQuery'
 import SetBirthday from './SetBirthday'
 
-const Authors = (props) => {
+const Authors = ({show, token}) => {
   const authors = useQuery(ALL_AUTHORS, {
     pollInterval: 2000
   })
   
-  if (!props.show) return null
+  if (!show) return null
 
   if (authors.loading) return <div>Loading view...</div>
 
@@ -30,7 +30,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <SetBirthday />
+      {token && <SetBirthday/>}
     </div>
   )
 }
