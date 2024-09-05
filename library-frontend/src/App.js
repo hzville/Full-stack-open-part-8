@@ -5,7 +5,8 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Notify from './components/Notify'
 import Recommend from './components/Recommend'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED } from './graphqlQueries/bookAddedSubscription'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -19,6 +20,14 @@ const App = () => {
       setErrormessage(null)
     }, 10000)
   }
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const book = data.data.bookAdded
+      notify(`New book has been added, title: ${book.title} by following author: ${book.author.name} `)
+    }
+  })
+
   
   const logout = () => {
     setToken(null)
