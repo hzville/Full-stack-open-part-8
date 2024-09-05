@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { ALL_BOOKS } from '../graphqlQueries/allBooksQuery'
 import { useState } from 'react'
 
-const Books = (props) => {
+const Books = ({show}) => {
   
   const booksQuery = useQuery(ALL_BOOKS, {
     pollInterval: 2000
@@ -10,7 +10,7 @@ const Books = (props) => {
   const [genre, setGenre] = useState(null)
 
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
