@@ -3,6 +3,8 @@ const Book = require('../../models/bookSchema')
 const User = require('../../models/userSchema')
 const { GraphQLError } = require('graphql')
 const jwt = require('jsonwebtoken')
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
 
 
 const resolvers = {
@@ -40,9 +42,11 @@ const resolvers = {
       try {
         if (authorPresent != null) {
           book.author = authorPresent
+          pubsub.publish('BOOK_ADDED', { bookAdded: book })
           return await book.save()
         } else {
           book.author = await new Author({name: args.author}).save()
+          pubsub.publish('BOOK_ADDED', { bookAdded: book })
           return await book.save()
         }
       } catch (error) {
@@ -106,10 +110,15 @@ const resolvers = {
         })
       }
       const userForToken = {
-        username: user.usernmae,
+        username: user.username,
         id: user._id
       }
       return {value: jwt.sign(userForToken, process.env.JWT_SECRET)}
+    }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED')
     }
   }
 }
